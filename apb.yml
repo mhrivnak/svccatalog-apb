@@ -1,0 +1,83 @@
+version: "1.0"
+name: catalog-apb
+description: service-catalog API server and controller-manager helm chart
+bindable: false
+async: optional
+metadata:
+  displayName: catalog (helm bundle)
+  imageUrl: ""
+plans:
+- name: default
+  description: Deploys helm chart catalog
+  free: true
+  metadata: {}
+  parameters:
+  - name: values
+    title: Values
+    type: string
+    display_type: textarea
+    default: "# Default values for Service Catalog\n# service-catalog image to use\nimage:
+      quay.io/kubernetes-service-catalog/service-catalog:v0.1.13\n# imagePullPolicy
+      for the service-catalog; valid values are \"IfNotPresent\",\n# \"Never\", and
+      \"Always\"\nimagePullPolicy: Always\n# determines whether the API server should
+      be registered with the kube-aggregator\nuseAggregator: true\n## If true, create
+      & use RBAC resources\n##\nrbacEnable: true\napiserver:\n  # PodPreset is an
+      optional feature and can be enabled by uncommenting the line below\n  # featureGates:
+      \"PodPreset=true\"\n  aggregator:\n    # priority is the priority of the APIService.
+      Please see\n    # https://github.com/kubernetes/kubernetes/blob/v1.7.0/staging/src/k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1/types.go#L56-L61\n
+      \   # for more information on proper values of this field.\n    #\n    # This
+      field is only applicable on clusters that expose APIService as a v1alpha1 field,\n
+      \   # which is generally 1.6.x clusters\n    priority: 100\n    # groupPriorityMinimum
+      is the minimum priority the group should have. Please see\n    # https://github.com/kubernetes/kubernetes/blob/v1.7.0/staging/src/k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1/types.go#L56-L61\n
+      \   # for more information on proper values of this field.\n    groupPriorityMinimum:
+      10000\n    # versionPriority is the ordering of this API inside of the group.
+      Please see\n    # https://github.com/kubernetes/kubernetes/blob/v1.7.0/staging/src/k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1/types.go#L56-L61\n
+      \   # for more information on proper values of this field\n    versionPriority:
+      20\n  tls:\n    # Base64-encoded CA used to validate request-header authentication,
+      when\n    # receiving delegated authentication from an aggregator. If not set,
+      the\n    # service catalog API server will inherit this CA from the\n    # extension-apiserver-authentication
+      ConfigMap if available.\n    requestHeaderCA:\n  # Attributes of the apiserver's
+      service resource\n  service:\n    # Type of service; valid values are \"LoadBalancer\"
+      and \"NodePort\"\n    # NodePort is useful if deploying on bare metal or hacking
+      locally on\n    # minikube\n    type: NodePort\n    # Further configuration
+      for services of type NodePort\n    nodePort:\n      # Available port in allowable
+      range (e.g. 30000 - 32767 on minikube)\n      # The TLS-enabled endpoint will
+      be exposed here\n      securePort: 30443\n  storage:\n    # The storage backend
+      to use; the only valid value is \"etcd\"\n    # (left for \"crd\" support in
+      future)\n    type: etcd\n    # Further configuration for the etcd-based backend\n
+      \   etcd:\n      # Whether to embed an etcd container in the apiserver pod\n
+      \     # THIS IS INADEQUATE FOR PRODUCTION USE!\n      useEmbedded: true\n      #
+      etcd URL(s); override this if NOT using embedded etcd\n      servers: http://localhost:2379\n
+      \     # etcd persistence options IF using embedded etcd\n      persistence:\n
+      \       enabled: false\n        ## If defined, storageClassName: <storageClass>\n
+      \       ## If set to \"-\", storageClassName: \"\", which disables dynamic provisioning\n
+      \       ## If undefined (the default) or set to null, no storageClassName spec
+      is\n        ##   set, choosing the default provisioner.  (gp2 on AWS, standard
+      on\n        ##   GKE, AWS & OpenStack)\n        ##\n        # storageClass:
+      \"-\"\n        accessMode: ReadWriteOnce\n        size: 4Gi\n  # Log level;
+      valid values are in the range 0 - 10\n  verbosity: 10\n  auth:\n    # Enable
+      or disable authentication and authorization. Disabling\n    # authentication
+      and authorization can be useful for outlying scenarios\n    # but is not suitable
+      for production.\n    enabled: true\n  audit:\n    # If true, enables the use
+      of audit features via this chart.\n    activated: false\n    # If specified,
+      audit log goes to specified path.\n    logPath: \"/tmp/service-catalog-apiserver-audit.log\"\n
+      \ serviceAccount: service-catalog-apiserver\n  # if true, makes the API server
+      serve the OpenAPI schema (which is problematic with older versions of kubectl)\n
+      \ serveOpenAPISpec: false\ncontrollerManager:\n  # Log level; valid values are
+      in the range 0 - 10\n  verbosity: 10\n  # Resync interval; format is a duration
+      (`20m`, `1h`, etc)\n  resyncInterval: 5m\n  # Broker relist interval; format
+      is a duration (`20m`, `1h`, etc)\n  brokerRelistInterval: 24h\n  # Whether or
+      not the controller supports a --broker-relist-interval flag. If this is \n  #
+      set to true, brokerRelistInterval will be used as the value for that flag\n
+      \ brokerRelistIntervalActivated: true\n  # enables profiling via web interface
+      host:port/debug/pprof/\n  profiling:\n    # Disable profiling via web interface
+      host:port/debug/pprof/\n    disabled: false\n    # Enables lock contention profiling,
+      if profiling is enabled.\n    contentionProfiling: false\n  leaderElection:\n
+      \   # Whether the controller has leader election enabled.\n    activated: false\n
+      \ serviceAccount: service-catalog-controller-manager\n  # Controls whether the
+      API server's TLS verification should be skipped.\n  apiserverSkipVerify: true\n
+      \ # Whether the controller will expose metrics on /metrics\n  enablePrometheusScrape:
+      false\n# Whether the OriginatingIdentity alpha feature should be enabled\noriginatingIdentityEnabled:
+      false\n# Whether the AsyncBindingOperations alpha feature should be enabled\nasyncBindingOperationsEnabled:
+      false\n# Whether the NamespacedServiceBroker alpha feature should be enabled\nnamespacedServiceBrokerEnabled:
+      false\n"
